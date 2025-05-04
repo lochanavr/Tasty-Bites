@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Bites - Home</title>
+    <link rel="stylesheet" href="Home.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Tasty Bites</div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="Home.html">Home</a></li>
+                <li id="loginLink"><a href="Login.html">Login</a></li>
+                <li id="profileLink" style="display: none;"><a href="Profile.html">Profile</a></li>
+                <li id="cartLink" style="display: none;"><a href="Cart.html">Cart</a></li>
+                <li id="ordersLink" style="display: none;"><a href="Orders.html">Orders</a></li>
+                <li id="logoutLink" style="display: none;"><a href="#" onclick="handleLogout()">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="welcome-message" id="welcomeMessage">
+                <h1>Welcome to Tasty Bites</h1>
+                <p>Discover the best food delivery experience</p>
+            </div>
+            <button class="explore-btn" onclick="handleExplore()">Explore Restaurants</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Tasty Bites. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Check user session on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            updateNavigation(currentUser);
+            updateWelcomeMessage(currentUser);
+        });
+
+        // Update navigation based on user session
+        function updateNavigation(user) {
+            const loginLink = document.getElementById('loginLink');
+            const profileLink = document.getElementById('profileLink');
+            const cartLink = document.getElementById('cartLink');
+            const ordersLink = document.getElementById('ordersLink');
+            const logoutLink = document.getElementById('logoutLink');
+
+            if (user) {
+                loginLink.style.display = 'none';
+                profileLink.style.display = 'block';
+                cartLink.style.display = 'block';
+                ordersLink.style.display = 'block';
+                logoutLink.style.display = 'block';
+            } else {
+                loginLink.style.display = 'block';
+                profileLink.style.display = 'none';
+                cartLink.style.display = 'none';
+                ordersLink.style.display = 'none';
+                logoutLink.style.display = 'none';
+            }
+        }
+
+        // Update welcome message based on user session
+        function updateWelcomeMessage(user) {
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            if (user) {
+                welcomeMessage.innerHTML = `
+                    <h1>Hey ${user.name}, Welcome Back!</h1>
+                    <p>Ready to explore more delicious options?</p>
+                `;
+            }
+        }
+
+        // Handle explore button click
+        function handleExplore() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                alert('Please login to explore restaurants');
+                window.location.href = 'Login.html';
+            } else {
+                window.location.href = 'Restaurant.html';
+            }
+        }
+
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            alert('Logged out successfully');
+            window.location.href = 'Home.html';
+        }
+
+        // Check authentication for protected pages
+        function checkAuth() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                alert('Please login to access this page');
+                window.location.href = 'Login.html';
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Bites - Orders</title>
+    <link rel="stylesheet" href="Orders.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Tasty Bites</div>
+            <ul class="nav-links">
+                <li><a href="Home.html">Home</a></li>
+                <li><a href="Profile.html">Profile</a></li>
+                <li><a href="Cart.html">Cart</a></li>
+                <li><a href="Orders.html">Orders</a></li>
+                <li><a href="#" onclick="handleLogout()">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="orders-container">
+            <h1>Your Orders</h1>
+            
+            <div class="orders-tabs">
+                <button class="tab-btn active" onclick="showTab('current')">Current Orders</button>
+                <button class="tab-btn" onclick="showTab('past')">Past Orders</button>
+            </div>
+
+            <div id="currentOrders" class="orders-section">
+                <div class="orders-list" id="currentOrdersList">
+                    <!-- Current orders will be dynamically added here -->
+                </div>
+            </div>
+
+            <div id="pastOrders" class="orders-section" style="display: none;">
+                <div class="orders-list" id="pastOrdersList">
+                    <!-- Past orders will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Tasty Bites. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                alert('Please login to view orders');
+                window.location.href = 'Login.html';
+                return;
+            }
+
+            loadOrders();
+        });
+
+        // Load and display orders
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const currentOrdersList = document.getElementById('currentOrdersList');
+            const pastOrdersList = document.getElementById('pastOrdersList');
+            
+            currentOrdersList.innerHTML = '';
+            pastOrdersList.innerHTML = '';
+
+            if (orders.length === 0) {
+                currentOrdersList.innerHTML = `
+                    <div class="empty-state">
+                        <p>No orders found</p>
+                        <a href="Restaurant.html" class="browse-btn">Browse Restaurants</a>
+                    </div>
+                `;
+                pastOrdersList.innerHTML = `
+                    <div class="empty-state">
+                        <p>No past orders found</p>
+                        <a href="Restaurant.html" class="browse-btn">Browse Restaurants</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort orders by date (newest first)
+            orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            orders.forEach(order => {
+                const orderCard = createOrderCard(order);
+                if (order.status === 'delivered') {
+                    pastOrdersList.appendChild(orderCard);
+                } else {
+                    currentOrdersList.appendChild(orderCard);
+                }
+            });
+        }
+
+        // Create order card element
+        function createOrderCard(order) {
+            const orderCard = document.createElement('div');
+            orderCard.className = 'order-card';
+            
+            const orderDate = new Date(order.date).toLocaleString();
+            const statusClass = order.status === 'delivered' ? 'status-delivered' : 
+                              order.status === 'preparing' ? 'status-preparing' : 
+                              'status-pending';
+
+            orderCard.innerHTML = `
+                <div class="order-header">
+                    <div class="order-info">
+                        <h3>Order #${order.id}</h3>
+                        <p class="order-date">${orderDate}</p>
+                    </div>
+                    <span class="order-status ${statusClass}">${order.status}</span>
+                </div>
+                <div class="order-items">
+                    ${order.items.map(item => `
+                        <div class="order-item">
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-quantity">x${item.quantity}</span>
+                            <span class="item-price">₹${item.price * item.quantity}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="order-footer">
+                    <div class="delivery-info">
+                        <p><strong>Delivery Address:</strong> ${order.deliveryDetails.address}</p>
+                        <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
+                    </div>
+                    <div class="order-total">
+                        <span>Total:</span>
+                        <span>₹${order.total}</span>
+                    </div>
+                </div>
+            `;
+
+            return orderCard;
+        }
+
+        // Switch between current and past orders tabs
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const sections = document.querySelectorAll('.orders-section');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            sections.forEach(section => section.style.display = 'none');
+
+            document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}Orders`).style.display = 'block';
+        }
+
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            alert('Logged out successfully');
+            window.location.href = 'Home.html';
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Bites - Menu</title>
+    <link rel="stylesheet" href="Menu.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Tasty Bites</div>
+            <ul class="nav-links">
+                <li><a href="Home.html">Home</a></li>
+                <li><a href="Profile.html">Profile</a></li>
+                <li><a href="Cart.html">Cart</a></li>
+                <li><a href="Orders.html">Orders</a></li>
+                <li><a href="#" onclick="handleLogout()">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="menu-container">
+            <div class="restaurant-header">
+                <h1 id="restaurantName">Restaurant Name</h1>
+                <div class="restaurant-info">
+                    <span id="restaurantRating">⭐ 4.5</span>
+                    <span id="restaurantCuisine">🍽️ Cuisine</span>
+                    <span id="restaurantDeliveryTime">🕒 25-30 min</span>
+                </div>
+            </div>
+
+            <div class="menu-categories">
+                <button class="category-btn active" data-category="all">All</button>
+                <button class="category-btn" data-category="starters">Starters</button>
+                <button class="category-btn" data-category="main-course">Main Course</button>
+                <button class="category-btn" data-category="desserts">Desserts</button>
+                <button class="category-btn" data-category="beverages">Beverages</button>
+            </div>
+
+            <div class="menu-items" id="menuItems">
+                <!-- Menu items will be dynamically added here -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Tasty Bites. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Check authentication and load restaurant data
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                alert('Please login to view menu');
+                window.location.href = 'Login.html';
+                return;
+            }
+
+            const restaurant = JSON.parse(localStorage.getItem('selectedRestaurant'));
+            if (!restaurant) {
+                alert('No restaurant selected');
+                window.location.href = 'Restaurant.html';
+                return;
+            }
+
+            // Update restaurant header
+            document.getElementById('restaurantName').textContent = restaurant.name;
+            document.getElementById('restaurantRating').textContent = `⭐ ${restaurant.rating}`;
+            document.getElementById('restaurantCuisine').textContent = `🍽️ ${restaurant.cuisine}`;
+            document.getElementById('restaurantDeliveryTime').textContent = `🕒 ${restaurant.deliveryTime}`;
+
+            loadMenuItems();
+            setupCategoryFilters();
+        });
+
+        // Sample menu items data
+        const menuItems = [
+            {
+                id: 1,
+                name: "Garlic Naan",
+                description: "Soft and fluffy bread with garlic butter",
+                price: 60,
+                image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+                category: "starters"
+            },
+            {
+                id: 2,
+                name: "Butter Chicken",
+                description: "Tender chicken in rich tomato gravy",
+                price: 280,
+                image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+                category: "main-course"
+            },
+            {
+                id: 3,
+                name: "Gulab Jamun",
+                description: "Sweet milk solids in sugar syrup",
+                price: 120,
+                image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+                category: "desserts"
+            },
+            {
+                id: 4,
+                name: "Mango Lassi",
+                description: "Sweet yogurt drink with mango",
+                price: 80,
+                image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+                category: "beverages"
+            }
+        ];
+
+        // Load menu items
+        function loadMenuItems(category = 'all') {
+            const menuContainer = document.getElementById('menuItems');
+            menuContainer.innerHTML = '';
+
+            const filteredItems = category === 'all' 
+                ? menuItems 
+                : menuItems.filter(item => item.category === category);
+
+            filteredItems.forEach(item => {
+                const menuItem = createMenuItem(item);
+                menuContainer.appendChild(menuItem);
+            });
+        }
+
+        // Create menu item element
+        function createMenuItem(item) {
+            const menuItem = document.createElement('div');
+            menuItem.className = 'menu-item';
+            menuItem.innerHTML = `
+                <img src="${item.image}" alt="${item.name}">
+                <div class="item-details">
+                    <h3>${item.name}</h3>
+                    <p class="description">${item.description}</p>
+                    <div class="item-footer">
+                        <span class="price">₹${item.price}</span>
+                        <button onclick="addToCart(${item.id})" class="add-to-cart-btn">Add to Cart</button>
+                    </div>
+                </div>
+            `;
+            return menuItem;
+        }
+
+        // Setup category filters
+        function setupCategoryFilters() {
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    // Load items for selected category
+                    loadMenuItems(this.dataset.category);
+                });
+            });
+        }
+
+        // Add item to cart
+        function addToCart(itemId) {
+            const item = menuItems.find(item => item.id === itemId);
+            if (!item) return;
+
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const existingItem = cart.find(cartItem => cartItem.id === itemId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    ...item,
+                    quantity: 1
+                });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert('Item added to cart!');
+        }
+
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            alert('Logged out successfully');
+            window.location.href = 'Home.html';
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,279 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f1f2f6;
+}
+
+/* Header and Navigation */
+.navbar {
+    background-color: #ff4757;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #f1f2f6;
+}
+
+/* Main Content */
+main {
+    flex: 1;
+    padding: 2rem;
+}
+
+.orders-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.orders-container h1 {
+    color: #2f3542;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Orders Tabs */
+.orders-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tab-btn {
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #dfe4ea;
+    color: #2f3542;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+    background-color: #ced6e0;
+}
+
+.tab-btn.active {
+    background-color: #ff4757;
+    color: white;
+}
+
+/* Orders Section */
+.orders-section {
+    margin-top: 2rem;
+}
+
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Order Card */
+.order-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.order-header {
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #dfe4ea;
+}
+
+.order-info h3 {
+    color: #2f3542;
+    margin-bottom: 0.5rem;
+}
+
+.order-date {
+    color: #57606f;
+    font-size: 0.9rem;
+}
+
+.order-status {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.status-pending {
+    background-color: #ffeaa7;
+    color: #b7791f;
+}
+
+.status-preparing {
+    background-color: #81ecec;
+    color: #00b894;
+}
+
+.status-delivered {
+    background-color: #55efc4;
+    color: #00b894;
+}
+
+/* Order Items */
+.order-items {
+    padding: 1.5rem;
+    border-bottom: 1px solid #dfe4ea;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+}
+
+.order-item:not(:last-child) {
+    border-bottom: 1px solid #f1f2f6;
+}
+
+.item-name {
+    color: #2f3542;
+    font-weight: 500;
+}
+
+.item-quantity {
+    color: #57606f;
+    font-size: 0.9rem;
+}
+
+.item-price {
+    color: #2f3542;
+    font-weight: 500;
+}
+
+/* Order Footer */
+.order-footer {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+}
+
+.delivery-info {
+    flex: 1;
+}
+
+.delivery-info p {
+    color: #57606f;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.order-total {
+    text-align: right;
+    font-weight: bold;
+    color: #2f3542;
+    font-size: 1.2rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state p {
+    color: #57606f;
+    margin-bottom: 1.5rem;
+}
+
+.browse-btn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    background-color: #ff4757;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.browse-btn:hover {
+    background-color: #ff6b81;
+}
+
+/* Footer */
+footer {
+    background-color: #2f3542;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    margin-top: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    .logo {
+        margin-bottom: 1rem;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .orders-tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .order-footer {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .order-total {
+        text-align: left;
+    }
+} 

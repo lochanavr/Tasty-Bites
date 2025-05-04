@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Bites - Profile</title>
+    <link rel="stylesheet" href="Profile.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Tasty Bites</div>
+            <ul class="nav-links">
+                <li><a href="Home.html">Home</a></li>
+                <li><a href="Profile.html">Profile</a></li>
+                <li><a href="Cart.html">Cart</a></li>
+                <li><a href="Orders.html">Orders</a></li>
+                <li><a href="#" onclick="handleLogout()">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="profile-container">
+            <h1>My Profile</h1>
+            <form id="profileForm" class="profile-form" onsubmit="handleProfileUpdate(event)">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" required disabled>
+                </div>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required disabled>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required disabled>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" required disabled>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea id="address" required disabled></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <input type="text" id="role" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="createdDate">Account Created</label>
+                    <input type="text" id="createdDate" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="lastLogin">Last Login</label>
+                    <input type="text" id="lastLogin" disabled>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="edit-btn" onclick="toggleEdit()">Edit Profile</button>
+                    <button type="button" class="change-password-btn" onclick="showChangePassword()">Change Password</button>
+                    <button type="submit" class="save-btn" style="display: none;">Save Changes</button>
+                </div>
+            </form>
+
+            <!-- Change Password Modal -->
+            <div id="passwordModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeChangePassword()">&times;</span>
+                    <h2>Change Password</h2>
+                    <form id="passwordForm" onsubmit="handlePasswordChange(event)">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" id="currentPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" id="newPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" required>
+                        </div>
+                        <button type="submit" class="submit-btn">Update Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Tasty Bites. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                alert('Please login to access your profile');
+                window.location.href = 'Login.html';
+                return;
+            }
+            loadUserProfile(currentUser);
+        });
+
+        // Load user profile data
+        function loadUserProfile(user) {
+            document.getElementById('name').value = user.name;
+            document.getElementById('username').value = user.username;
+            document.getElementById('email').value = user.email;
+            document.getElementById('phone').value = user.phone;
+            document.getElementById('address').value = user.address;
+            document.getElementById('role').value = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            document.getElementById('createdDate').value = new Date(user.createdDate).toLocaleString();
+            document.getElementById('lastLogin').value = new Date(user.lastLogin).toLocaleString();
+        }
+
+        // Toggle edit mode
+        function toggleEdit() {
+            const inputs = document.querySelectorAll('.profile-form input:not([id="username"]), .profile-form textarea');
+            const editBtn = document.querySelector('.edit-btn');
+            const saveBtn = document.querySelector('.save-btn');
+            
+            if (inputs[0].disabled) {
+                inputs.forEach(input => input.disabled = false);
+                editBtn.style.display = 'none';
+                saveBtn.style.display = 'block';
+            } else {
+                inputs.forEach(input => input.disabled = true);
+                editBtn.style.display = 'block';
+                saveBtn.style.display = 'none';
+            }
+        }
+
+        // Handle profile update
+        function handleProfileUpdate(event) {
+            event.preventDefault();
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const users = JSON.parse(localStorage.getItem('users'));
+            
+            // Update user data
+            const updatedUser = {
+                ...currentUser,
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value
+            };
+
+            // Update in users array
+            const userIndex = users.findIndex(u => u.username === currentUser.username);
+            users[userIndex] = updatedUser;
+
+            // Save to localStorage
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+
+            // Reset form
+            toggleEdit();
+            alert('Profile updated successfully');
+        }
+
+        // Show change password modal
+        function showChangePassword() {
+            document.getElementById('passwordModal').style.display = 'block';
+        }
+
+        // Close change password modal
+        function closeChangePassword() {
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('passwordForm').reset();
+        }
+
+        // Handle password change
+        function handlePasswordChange(event) {
+            event.preventDefault();
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const users = JSON.parse(localStorage.getItem('users'));
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (currentPassword !== currentUser.password) {
+                alert('Current password is incorrect');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match');
+                return;
+            }
+
+            // Update password
+            const userIndex = users.findIndex(u => u.username === currentUser.username);
+            users[userIndex].password = newPassword;
+            currentUser.password = newPassword;
+
+            // Save to localStorage
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            closeChangePassword();
+            alert('Password updated successfully');
+        }
+
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            alert('Logged out successfully');
+            window.location.href = 'Home.html';
+        }
+    </script>
+</body>
+</html> 

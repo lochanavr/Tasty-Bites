@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasty Bites - Cart</title>
+    <link rel="stylesheet" href="Cart.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Tasty Bites</div>
+            <ul class="nav-links">
+                <li><a href="Home.html">Home</a></li>
+                <li><a href="Profile.html">Profile</a></li>
+                <li><a href="Cart.html">Cart</a></li>
+                <li><a href="Orders.html">Orders</a></li>
+                <li><a href="#" onclick="handleLogout()">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="cart-container">
+            <h1>Your Cart</h1>
+            
+            <div class="cart-content">
+                <div class="cart-items" id="cartItems">
+                    <!-- Cart items will be dynamically added here -->
+                </div>
+
+                <div class="cart-summary">
+                    <h2>Order Summary</h2>
+                    <div class="summary-item">
+                        <span>Subtotal</span>
+                        <span id="subtotal">₹0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Delivery Fee</span>
+                        <span id="deliveryFee">₹40</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Tax (5%)</span>
+                        <span id="tax">₹0</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>Total</span>
+                        <span id="total">₹0</span>
+                    </div>
+                    <button id="checkoutBtn" class="checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
+                </div>
+            </div>
+
+            <div id="emptyCart" class="empty-cart" style="display: none;">
+                <img src="https://cdn-icons-png.flaticon.com/512/3081/3081559.png" alt="Empty Cart">
+                <h2>Your cart is empty</h2>
+                <p>Looks like you haven't added anything to your cart yet.</p>
+                <a href="Restaurant.html" class="browse-btn">Browse Restaurants</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Tasty Bites. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                alert('Please login to view cart');
+                window.location.href = 'Login.html';
+                return;
+            }
+            loadCart();
+        });
+
+        // Load cart items
+        function loadCart() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartItemsContainer = document.getElementById('cartItems');
+            const emptyCartDiv = document.getElementById('emptyCart');
+            const cartContent = document.querySelector('.cart-content');
+
+            if (cart.length === 0) {
+                emptyCartDiv.style.display = 'flex';
+                cartContent.style.display = 'none';
+                return;
+            }
+
+            emptyCartDiv.style.display = 'none';
+            cartContent.style.display = 'flex';
+            cartItemsContainer.innerHTML = '';
+
+            cart.forEach(item => {
+                const cartItem = createCartItem(item);
+                cartItemsContainer.appendChild(cartItem);
+            });
+
+            updateSummary();
+        }
+
+        // Create cart item element
+        function createCartItem(item) {
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+            cartItem.innerHTML = `
+                <img src="${item.image}" alt="${item.name}">
+                <div class="item-details">
+                    <h3>${item.name}</h3>
+                    <p class="price">₹${item.price}</p>
+                </div>
+                <div class="quantity-controls">
+                    <button onclick="updateQuantity(${item.id}, -1)">-</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="updateQuantity(${item.id}, 1)">+</button>
+                </div>
+                <div class="item-total">
+                    <span>₹${item.price * item.quantity}</span>
+                    <button onclick="removeItem(${item.id})" class="remove-btn">Remove</button>
+                </div>
+            `;
+            return cartItem;
+        }
+
+        // Update item quantity
+        function updateQuantity(itemId, change) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const itemIndex = cart.findIndex(item => item.id === itemId);
+
+            if (itemIndex !== -1) {
+                cart[itemIndex].quantity += change;
+
+                if (cart[itemIndex].quantity <= 0) {
+                    cart.splice(itemIndex, 1);
+                }
+
+                localStorage.setItem('cart', JSON.stringify(cart));
+                loadCart();
+            }
+        }
+
+        // Remove item from cart
+        function removeItem(itemId) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart = cart.filter(item => item.id !== itemId);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            loadCart();
+        }
+
+        // Update order summary
+        function updateSummary() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+            const deliveryFee = 40;
+            const tax = subtotal * 0.05;
+            const total = subtotal + deliveryFee + tax;
+
+            document.getElementById('subtotal').textContent = `₹${subtotal}`;
+            document.getElementById('tax').textContent = `₹${tax.toFixed(2)}`;
+            document.getElementById('total').textContent = `₹${total.toFixed(2)}`;
+        }
+
+        // Proceed to checkout
+        function proceedToCheckout() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            window.location.href = 'Checkout.html';
+        }
+
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            alert('Logged out successfully');
+            window.location.href = 'Home.html';
+        }
+    </script>
+</body>
+</html> 
